@@ -24,6 +24,65 @@ This project builds a multi-output CNN to recognize alphanumeric CAPTCHA images 
 
 ---
 
+## Image Processing & Label Encoding
+
+```python
+# Normalize image pixel values to range [0, 1]
+cap_X_train = np.array([np.array(Image.open(img).resize((128, 64))) / 255.0 for img in cap_X_train])
+cap_X_test = np.array([np.array(Image.open(img).resize((128, 64))) / 255.0 for img in cap_X_test])
+
+# One-hot encode labels
+char_to_int = {char: idx for idx, char in enumerate('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')}
+cap_y_train_encoded = [[char_to_int[char] for char in label] for label in cap_y_train]
+cap_y_test_encoded = [[char_to_int[char] for char in label] for label in cap_y_test]
+
+# Then one-hot encode each character
+cap_y_train = np.array([to_categorical(label, num_classes=len(char_to_int)) for label in cap_y_train_encoded])
+cap_y_test = np.array([to_categorical(label, num_classes=len(char_to_int)) for label in cap_y_test_encoded])
+```
+
+---
+
+## Model Architecture
+
+```python
+captcha_length = 5  # If your captchas are 5 characters
+num_classes = len(char_to_int)  # Should be 62 if using 0-9, A-Z, a-z
+
+inputs = keras.Input(shape=(64, 128, 3))
+x = keras.layers.Conv2D(32, (3, 3), padding='same', activation='relu')(inputs)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.MaxPooling2D((2, 2))(x)
+
+x = keras.layers.Conv2D(64, (3, 3), padding='same', activation='relu')(x)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.MaxPooling2D((2, 2))(x)
+
+x = keras.layers.Conv2D(128, (3, 3), padding='same', activation='relu')(x)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.MaxPooling2D((2, 2))(x)
+
+x = keras.layers.Conv2D(256, (3, 3), padding='same', activation='relu')(x)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.SpatialDropout2D(0.3)(x)
+#x = keras.layers.GlobalMaxPooling2D()(x)
+x = keras.layers.GlobalAveragePooling2D()(x)
+
+x = keras.layers.Dropout(0.5)(x)
+
+# One Dense output per character
+outputs = [Dense(num_classes, activation='softmax', name=f'char_{i}')(x) for i in range(captcha_length)]
+
+model = keras.Model(inputs=inputs, outputs=outputs)
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy'] * captcha_length
+)
+```
+
+---
+
 ## Model Performance
 
 | Character Position | Accuracy | Loss |
