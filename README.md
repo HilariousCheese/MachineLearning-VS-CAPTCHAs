@@ -106,10 +106,10 @@ model.compile(
 
 ![Model Predictions Examples](plots/Model%20Predictions%20Examples.png)
 
-| Input CAPTCHA | Predicted | Actual | Notes |
-|---------------|-----------|--------|-------|
-| `wjCwa`       | `wjwCa`   | `wjCwa`| Case error on char_2 |
-| `aB1cD`       | `aB1cD`   | `aB1cD`| ✅ Correct |
+| Input CAPTCHA | Predicted | Notes |
+|---------------|-----------|-------|
+| `3USsE`       | `3UssE`   | ✅ Correct |
+| `wjCwa`       | `wjwCa`   | Case error on char_2 |
 
 ---
 
