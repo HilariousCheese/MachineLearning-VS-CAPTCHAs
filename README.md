@@ -39,11 +39,13 @@ This project builds a multi-output CNN to recognize alphanumeric CAPTCHA images 
 ---
 
 ## Training Visualization
-
+![Training vs Validation Loss](plots/Training%20and%20validation%20Loss%2C%20Per-Character%20Accuracy%20per%20Epoch.png)
 
 ---
 
 ## Sample Predictions
+
+![Model Predictions Examples](plots/Model%20Predictions%20Examples.png)
 
 | Input CAPTCHA | Predicted | Actual | Notes |
 |---------------|-----------|--------|-------|
